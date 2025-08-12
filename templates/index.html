@@ -1,117 +1,75 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网络测速工具</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .speed-display {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .speed-value {
-            font-size: 3em;
-            font-weight: bold;
-            color: #2196F3;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background-color: #4CAF50;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        button {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 5px;
-            cursor: pointer;
-            display: block;
-            margin: 20px auto;
-        }
-        button:hover {
-            background-color: #1976D2;
-        }
-        button:disabled {
-            background-color: #BBDEFB;
-            cursor: not-allowed;
-        }
-        .test-info {
-            text-align: center;
-            margin: 10px 0;
-            color: #666;
-        }
-        .status {
-            text-align: center;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .status.testing {
-            background-color: #FFF3E0;
-            color: #F57C00;
-        }
-        .status.completed {
-            background-color: #E8F5E9;
-            color: #388E3C;
-        }
-    </style>
+    <title>网络速度测试</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align: center;">网络测速工具</h1>
-        <div class="test-info">
-            <p>测试服务器: <strong id="server-name">Loading...</strong></p>
-        </div>
-        
-        <div id="status" class="status" style="display: none;"></div>
-        
-        <div class="speed-display">
-            <div>下载速度</div>
-            <div id="download-speed" class="speed-value">0.00</div>
-            <div>Mbps</div>
-        </div>
-        
-        <div class="progress-bar">
-            <div id="download-progress" class="progress-fill"></div>
-        </div>
-        
-        <div class="speed-display">
-            <div>上传速度</div>
-            <div id="upload-speed" class="speed-value">0.00</div>
-            <div>Mbps</div>
-        </div>
-        
-        <div class="progress-bar">
-            <div id="upload-progress" class="progress-fill"></div>
-        </div>
-        
-        <button id="start-button">开始测速</button>
+        <header>
+            <h1><i class="fas fa-tachometer-alt"></i> 网络速度测试</h1>
+            <p>测试您的网络下载和上传速度</p>
+        </header>
+
+        <main>
+            <div class="server-info">
+                <h2><i class="fas fa-server"></i> 测试服务器</h2>
+                <div class="server-name">{{ server_name }}</div>
+            </div>
+
+            <div class="test-controls">
+                <button id="start-download-test" class="btn btn-primary">
+                    <i class="fas fa-download"></i> 开始下载测试
+                </button>
+                <button id="start-upload-test" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> 开始上传测试
+                </button>
+                <button id="reset-test" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> 重置
+                </button>
+            </div>
+
+            <div class="test-results">
+                <div class="result-card">
+                    <h3><i class="fas fa-download"></i> 下载速度</h3>
+                    <div id="download-speed" class="speed-value">0 Mbps</div>
+                    <div class="progress-bar">
+                        <div id="download-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-upload"></i> 上传速度</h3>
+                    <div id="upload-speed" class="speed-value">0 Mbps</div>
+                    <div class="progress-bar">
+                        <div id="upload-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3><i class="fas fa-clock"></i> 延迟</h3>
+                    <div id="ping-value" class="speed-value">0 ms</div>
+                    <div class="progress-bar">
+                        <div id="ping-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-status">
+                <div id="test-status-text">准备就绪</div>
+                <div class="status-indicator" id="status-indicator"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2023 网络速度测试工具 | 服务器: {{ server_name }}</p>
+        </footer>
     </div>
 
-    <script src="{{ url_for('static', filename='js/speedtest.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
