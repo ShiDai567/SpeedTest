@@ -17,8 +17,20 @@
 
         <main>
             <div class="server-info">
-                <h2><i class="fas fa-server"></i> 测试服务器</h2>
-                <div class="server-name">{{ server_name }}</div>
+                <h2><i class="fas fa-server"></i> 测速节点选择</h2>
+                <div class="node-selector">
+                    <select id="node-selector">
+                        {% for node_id, node_info in nodes.items() %}
+                        <option value="{{ node_id }}" {% if node_id == default_node %}selected{% endif %}>
+                            {{ node_info.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button id="refresh-node-info" class="btn btn-secondary">
+                        <i class="fas fa-sync"></i> 刷新
+                    </button>
+                </div>
+                <div class="server-name" id="current-server-name">{{ server_name }}</div>
             </div>
 
             <div class="test-controls">
@@ -40,6 +52,7 @@
                     <div class="progress-bar">
                         <div id="download-progress" class="progress-fill"></div>
                     </div>
+                    <div id="download-details" class="test-details"></div>
                 </div>
 
                 <div class="result-card">
@@ -48,6 +61,7 @@
                     <div class="progress-bar">
                         <div id="upload-progress" class="progress-fill"></div>
                     </div>
+                    <div id="upload-details" class="test-details"></div>
                 </div>
 
                 <div class="result-card">
@@ -56,6 +70,7 @@
                     <div class="progress-bar">
                         <div id="ping-progress" class="progress-fill"></div>
                     </div>
+                    <div id="ping-details" class="test-details"></div>
                 </div>
             </div>
 
@@ -63,10 +78,17 @@
                 <div id="test-status-text">准备就绪</div>
                 <div class="status-indicator" id="status-indicator"></div>
             </div>
+
+            <div class="test-history">
+                <h2><i class="fas fa-history"></i> 测试历史</h2>
+                <div class="history-list" id="history-list">
+                    <div class="history-placeholder">暂无测试记录</div>
+                </div>
+            </div>
         </main>
 
         <footer>
-            <p>© 2023 网络速度测试工具 | 服务器: {{ server_name }}</p>
+            <p>© 2023 网络速度测试工具 | 当前节点: <span id="footer-server-name">{{ server_name }}</span></p>
         </footer>
     </div>
 
