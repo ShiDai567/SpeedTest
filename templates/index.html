@@ -1,97 +1,74 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网络速度测试</title>
+    <title>网络测速工具</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-tachometer-alt"></i> 网络速度测试</h1>
-            <p>测试您的网络下载和上传速度</p>
-        </header>
-
-        <main>
-            <div class="server-info">
-                <h2><i class="fas fa-server"></i> 测速节点选择</h2>
-                <div class="node-selector">
-                    <select id="node-selector">
-                        {% for node_id, node_info in nodes.items() %}
-                        <option value="{{ node_id }}" {% if node_id == default_node %}selected{% endif %}>
-                            {{ node_info.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button id="refresh-node-info" class="btn btn-secondary">
-                        <i class="fas fa-sync"></i> 刷新
-                    </button>
-                </div>
-                <div class="server-name" id="current-server-name">{{ server_name }}</div>
-            </div>
-
-            <div class="test-controls">
-                <button id="start-download-test" class="btn btn-primary">
-                    <i class="fas fa-download"></i> 开始下载测试
-                </button>
-                <button id="start-upload-test" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> 开始上传测试
-                </button>
-                <button id="reset-test" class="btn btn-secondary">
-                    <i class="fas fa-redo"></i> 重置
-                </button>
-            </div>
-
-            <div class="test-results">
-                <div class="result-card">
-                    <h3><i class="fas fa-download"></i> 下载速度</h3>
-                    <div id="download-speed" class="speed-value">0 Mbps</div>
-                    <div class="progress-bar">
-                        <div id="download-progress" class="progress-fill"></div>
+        <h1>网络测速工具</h1>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="speedtest">测速</button>
+            <button class="tab-button" data-tab="history">历史记录</button>
+            <button class="tab-button" data-tab="servers">服务器</button>
+        </div>
+        <div class="tab-content">
+            <div id="speedtest-tab" class="tab-pane active">
+                <div class="speed-test-container">
+                    <button id="start-test" class="test-button">开始测速</button>
+                    <div id="loading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p id="progress-text">正在测速中...</p>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
                     </div>
-                    <div id="download-details" class="test-details"></div>
-                </div>
-
-                <div class="result-card">
-                    <h3><i class="fas fa-upload"></i> 上传速度</h3>
-                    <div id="upload-speed" class="speed-value">0 Mbps</div>
-                    <div class="progress-bar">
-                        <div id="upload-progress" class="progress-fill"></div>
+                    <div id="results" class="results hidden">
+                        <div class="result-item">
+                            <h3>延迟</h3>
+                            <p id="ping-value">-</p>
+                            <span>ms</span>
+                        </div>
+                        <div class="result-item">
+                            <h3>下载速度</h3>
+                            <p id="download-value">-</p>
+                            <span>Mbps</span>
+                        </div>
+                        <div class="result-item">
+                            <h3>上传速度</h3>
+                            <p id="upload-value">-</p>
+                            <span>Mbps</span>
+                        </div>
+                        <div class="result-item">
+                            <h3>服务器</h3>
+                            <p id="server-value">-</p>
+                            <span id="sponsor-value"></span>
+                        </div>
+                        <div class="result-item">
+                            <h3>位置</h3>
+                            <p id="location-value">-</p>
+                            <span>地区</span>
+                        </div>
                     </div>
-                    <div id="upload-details" class="test-details"></div>
-                </div>
-
-                <div class="result-card">
-                    <h3><i class="fas fa-clock"></i> 延迟</h3>
-                    <div id="ping-value" class="speed-value">0 ms</div>
-                    <div class="progress-bar">
-                        <div id="ping-progress" class="progress-fill"></div>
-                    </div>
-                    <div id="ping-details" class="test-details"></div>
                 </div>
             </div>
-
-            <div class="test-status">
-                <div id="test-status-text">准备就绪</div>
-                <div class="status-indicator" id="status-indicator"></div>
-            </div>
-
-            <div class="test-history">
-                <h2><i class="fas fa-history"></i> 测试历史</h2>
-                <div class="history-list" id="history-list">
-                    <div class="history-placeholder">暂无测试记录</div>
+            <div id="history-tab" class="tab-pane">
+                <div id="history-content">
+                    <p>加载中...</p>
                 </div>
             </div>
-        </main>
-
-        <footer>
-            <p>© 2023 网络速度测试工具 | 当前节点: <span id="footer-server-name">{{ server_name }}</span></p>
-        </footer>
+            <div id="servers-tab" class="tab-pane">
+                <div id="servers-content">
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>

@@ -4,3 +4,4 @@ PyYAML
 aiohttp
 requests
 Flask-CORS
+speedtest-cli

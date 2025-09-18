@@ -1,186 +1,210 @@
-# main.py
+import json
 import os
+import threading
 import time
+import uuid
+from datetime import datetime
 
-import requests
-import yaml
-from flask import Flask, Response, jsonify, render_template, request
+import speedtest
+from flask import Flask, jsonify, render_template
 
-app = Flask(__name__, static_url_path="/static")
-app.config["SECRET_KEY"] = "your-secret-key"
-app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 设置最大内容长度为100MB
+app = Flask(__name__)
 
-# 配置文件路径
-CONFIG_PATH = "config/node.yaml"
+# 存储历史记录的文件路径
+HISTORY_FILE = "speedtest_history.json"
+
+# 全局变量用于存储正在进行的测速任务
+current_test = {}
+test_lock = threading.Lock()
+
+# 服务器列表缓存
+server_list_cache = {"timestamp": 0, "data": []}
+SERVER_CACHE_TTL = 3600  # 缓存1小时
 
 
-def load_server_config():
-    """加载服务器配置"""
-    if not os.path.exists(CONFIG_PATH):
-        # 如果配置文件不存在，则创建默认配置
-        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-        default_config = {
-            "default_node": "node1",
-            "nodes": {
-                "node1": {
-                    "name": "默认测速节点",
-                    "url": "https://alist.elsworld.cn:8443/d/Temp/Diskgenius_Pro_x86_5.5.0.1488_cn.exe?sign=9gXPx3V8rLJnlUf5MIHfcDVJc2yIt34XCnuZPgZoCH8=:0",
-                },
-                "node2": {
-                    "name": "备用测速节点",
-                    "url": "https://dldir1v6.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.20_250724_x64_01.exe",
-                },
-                "node3": {
-                    "name": "国际测速节点",
-                    "url": "https://cdn.jsdelivr.net/gh/prometheus/prometheus@main/LICENSE",
-                },
-            },
+def load_history():
+    """加载历史记录"""
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+
+def save_history(record):
+    """保存历史记录"""
+    history = load_history()
+    history.append(record)
+    # 只保留最近100条记录
+    if len(history) > 100:
+        history = history[-100:]
+    with open(HISTORY_FILE, "w") as f:
+        json.dump(history, f)
+
+
+def run_speed_test():
+    """执行测速任务"""
+    with test_lock:
+        current_test["status"] = "running"
+        current_test["progress"] = "初始化测速..."
+
+    try:
+        # 创建 Speedtest 对象
+        with test_lock:
+            current_test["progress"] = "连接测速服务器..."
+        s = speedtest.Speedtest()
+
+        # 获取最佳服务器
+        with test_lock:
+            current_test["progress"] = "查找最佳服务器..."
+        best_server = s.get_best_server()
+
+        # 测试下载速度
+        with test_lock:
+            current_test["progress"] = "测试下载速度..."
+        download_speed = s.download() / 1_000_000  # 转换为 Mbps
+
+        # 测试上传速度
+        with test_lock:
+            current_test["progress"] = "测试上传速度..."
+        upload_speed = s.upload() / 1_000_000  # 转换为 Mbps
+
+        # 获取 ping 值
+        ping = s.results.ping
+
+        # 创建记录
+        record = {
+            "id": str(uuid.uuid4()),  # 使用UUID作为唯一ID
+            "timestamp": datetime.now().isoformat(),
+            "ping": round(ping, 2),
+            "download": round(download_speed, 2),
+            "upload": round(upload_speed, 2),
+            "server": best_server["name"],
+            "sponsor": best_server["sponsor"],
+            "server_location": f"{best_server['country']} - {best_server['location']}",
+            "unit": "Mbps",
         }
-        with open(CONFIG_PATH, "w") as f:
-            yaml.dump(default_config, f)
-        return default_config
 
-    # 读取现有配置
-    with open(CONFIG_PATH, "r") as f:
-        config = yaml.safe_load(f)
-        return config
+        # 保存记录
+        save_history(record)
 
+        with test_lock:
+            current_test["status"] = "completed"
+            current_test["result"] = record
+            current_test["progress"] = "测速完成"
 
-# 加载服务器配置
-server_config = load_server_config()
+        return record
+    except Exception as e:
+        with test_lock:
+            current_test["status"] = "error"
+            current_test["error"] = str(e)
+            current_test["progress"] = "测速失败"
+        raise e
 
 
 @app.route("/")
 def index():
-    """主页路由"""
-    # 获取默认节点
-    default_node = server_config.get("default_node", "node1")
-    nodes = server_config.get("nodes", {})
-    default_node_info = nodes.get(default_node, {})
-
-    return render_template(
-        "index.html",
-        server_name=default_node_info.get("name", "Unknown Server"),
-        nodes=nodes,
-        default_node=default_node,
-    )
+    return render_template("index.html")
 
 
-@app.route("/api/config")
-def get_config():
-    """API端点，提供测速配置"""
-    return jsonify(server_config)
+@app.route("/speedtest/start", methods=["POST"])
+def start_speed_test():
+    """开始测速任务"""
+    with test_lock:
+        # 检查是否已有测速任务在运行
+        if current_test.get("status") == "running":
+            return jsonify({"status": "error", "message": "测速任务已在运行中"}), 400
+
+        # 重置测速状态
+        current_test.clear()
+        current_test["status"] = "starting"
+        current_test["progress"] = "准备开始测速..."
+
+    # 在后台线程中运行测速
+    thread = threading.Thread(target=run_speed_test)
+    thread.daemon = True
+    thread.start()
+
+    return jsonify({"status": "success", "message": "测速任务已启动"})
 
 
-@app.route("/api/config/<node_id>")
-def get_node_config(node_id):
-    """API端点，提供指定节点的测速配置"""
-    nodes = server_config.get("nodes", {})
-    if node_id in nodes:
-        return jsonify(nodes[node_id])
-    else:
-        return jsonify({"error": "Node not found"}), 404
+@app.route("/speedtest/status")
+def get_speed_test_status():
+    """获取测速状态"""
+    with test_lock:
+        return jsonify(current_test.copy())
 
 
-@app.route("/api/test-file-info")
-def get_test_file_info():
-    """获取测试文件信息"""
-    # 获取默认节点
-    default_node = server_config.get("default_node", "node1")
-    nodes = server_config.get("nodes", {})
-    node_info = nodes.get(default_node, {})
-
-    url = node_info.get("url")
-    if not url:
-        return jsonify({"error": "No download URL configured"}), 400
-
+@app.route("/speedtest/latest")
+def get_latest_result():
+    """获取最新的测速结果"""
     try:
-        response = requests.head(url, timeout=10)
-        content_length = response.headers.get("content-length")
-        content_type = response.headers.get("content-type")
-
-        result = {
-            "size": int(content_length) if content_length else None,
-            "contentType": content_type,
-            "url": url,
-        }
-        return jsonify(result)
+        history = load_history()
+        if history:
+            # 历史记录是按追加顺序存储的，最后一条就是最新的
+            latest = history[-1]
+            return jsonify({"result": latest, "status": "success"})
+        else:
+            return jsonify({"result": None, "status": "success"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e), "status": "error"}), 500
 
 
-@app.route("/api/test-file-info/<node_id>")
-def get_node_test_file_info(node_id):
-    """获取指定节点的测试文件信息"""
-    nodes = server_config.get("nodes", {})
-    if node_id not in nodes:
-        return jsonify({"error": "Node not found"}), 404
-
-    node_info = nodes[node_id]
-    url = node_info.get("url")
-    if not url:
-        return jsonify({"error": "No download URL configured for this node"}), 400
-
+@app.route("/history")
+def get_history():
+    """获取历史记录"""
     try:
-        response = requests.head(url, timeout=10)
-        content_length = response.headers.get("content-length")
-        content_type = response.headers.get("content-type")
-
-        result = {
-            "size": int(content_length) if content_length else None,
-            "contentType": content_type,
-            "url": url,
-        }
-        return jsonify(result)
+        history = load_history()
+        # 按时间倒序排列
+        history.sort(key=lambda x: x["timestamp"], reverse=True)
+        return jsonify({"history": history, "status": "success"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e), "status": "error"}), 500
 
 
-@app.route("/upload", methods=["POST", "OPTIONS"])
-def upload_endpoint():
-    """处理上传测试的端点"""
-    if request.method == "OPTIONS":
-        # 处理预检请求
-        response = jsonify({"status": "OK"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        return response
-
+@app.route("/history/<string:record_id>")
+def get_history_item(record_id: str):
+    """获取单条历史记录"""
     try:
-        # 获取上传的数据
-        uploaded_data = request.get_data()
-
-        # 模拟处理时间（可选，根据需要调整）
-        # 这有助于更真实地模拟服务器处理时间
-        # time.sleep(0.001)
-
-        # 可以在这里添加数据验证逻辑
-        return jsonify({"status": "success", "bytes_received": len(uploaded_data)}), 200
+        history = load_history()
+        for record in history:
+            if record.get("id") == record_id:
+                return jsonify({"record": record, "status": "success"})
+        return jsonify({"error": "记录未找到", "status": "error"}), 404
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"error": str(e), "status": "error"}), 500
 
 
-# 增加一个专门用于测速的上传端点，不做任何处理直接返回
-@app.route("/speedtest-upload", methods=["POST", "OPTIONS"])
-def speedtest_upload_endpoint():
-    """专门用于速度测试的上传端点，最小化处理时间"""
-    if request.method == "OPTIONS":
-        # 处理预检请求
-        response = jsonify({"status": "OK"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        return response
+@app.route("/servers")
+def get_servers():
+    """获取可用的测速服务器列表"""
+    now = time.time()
+    # 检查缓存是否有效
+    if now - server_list_cache["timestamp"] > SERVER_CACHE_TTL:
+        try:
+            s = speedtest.Speedtest()
+            servers = s.get_servers()
+            # 提取服务器信息
+            server_list = []
+            for server_id, server_info in servers.items():
+                if server_info:
+                    server = server_info[0]  # 取第一个服务器信息
+                    server_list.append(
+                        {
+                            "id": server["id"],
+                            "name": server["name"],
+                            "sponsor": server["sponsor"],
+                            "country": server["country"],
+                            "location": server.get("location", "Unknown"),
+                            "latency": server.get("latency", "Unknown"),
+                        }
+                    )
+            # 更新缓存
+            server_list_cache["data"] = server_list
+            server_list_cache["timestamp"] = now
+        except Exception as e:
+            return jsonify({"error": str(e), "status": "error"}), 500
 
-    try:
-        # 直接获取数据长度，不保存数据
-        content_length = request.content_length or len(request.get_data())
-
-        # 立即返回，不做任何处理
-        return jsonify({"status": "success", "bytes_received": content_length}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    return jsonify({"servers": server_list_cache["data"], "status": "success"})
 
 
 if __name__ == "__main__":
