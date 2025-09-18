@@ -66,12 +66,12 @@ header p {
 
 #speed-display {
     position: absolute;
-    top: 65%;
+    top: 95%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2.5em;
+    font-size: 2em;
     /* Original font size */
-    font-weight: bold;
+    /* font-weight: bold; */
     color: #e0e0e0;
     /* Adjusted for dark theme */
 }
