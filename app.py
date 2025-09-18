@@ -1,5 +1,5 @@
 # app.py
-# Backend for the Flask Speed Test Website
+# Flask 测速网站的后端
 
 import json
 import logging
@@ -8,32 +8,32 @@ import time
 
 from flask import Flask, Response, jsonify, render_template, request
 
-# Configure logging
+# 配置日志
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
-# In-memory store for speed test history.
-# In a production app, you'd want to use a database.
+# 内存中的测速历史记录存储。
+# 在生产应用中，您会希望使用数据库。
 speed_test_history = []
 
-# Define the path for the history file
+# 定义历史文件路径
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 HISTORY_FILE = os.path.join(DATA_DIR, "speed_history.json")
 
-logging.info(f"Data directory: {DATA_DIR}")
-logging.info(f"History file path: {HISTORY_FILE}")
+logging.info(f"数据目录: {DATA_DIR}")
+logging.info(f"历史文件路径: {HISTORY_FILE}")
 
-# Ensure the data directory exists
+# 确保数据目录存在
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# In-memory store for speed test history.
+# 内存中的测速历史记录存储。
 speed_test_history = []
 
 
 def load_history():
     """
-    Loads speed test history from the JSON file.
+    从 JSON 文件加载测速历史记录。
     """
     global speed_test_history
     if os.path.exists(HISTORY_FILE):
@@ -41,31 +41,31 @@ def load_history():
             try:
                 speed_test_history = json.load(f)
             except json.JSONDecodeError:
-                speed_test_history = []  # Handle empty or corrupt JSON
+                speed_test_history = []  # 处理空或损坏的 JSON
     else:
         speed_test_history = []
 
 
 def save_history():
     """
-    Saves current speed test history to the JSON file.
+    将当前测速历史记录保存到 JSON 文件。
     """
     try:
         with open(HISTORY_FILE, "w") as f:
             json.dump(speed_test_history, f, indent=4)
-        logging.info(f"History saved to {HISTORY_FILE}")
+        logging.info(f"历史记录已保存到 {HISTORY_FILE}")
     except IOError as e:
-        logging.error(f"Error saving history to {HISTORY_FILE}: {e}")
+        logging.error(f"保存历史记录到 {HISTORY_FILE} 时出错: {e}")
 
 
-# Load history when the application starts
+# 应用启动时加载历史记录
 load_history()
 
 
 @app.route("/")
 def index():
     """
-    Renders the main page of the website.
+    渲染网站主页。
     """
     return render_template("index.html")
 
@@ -73,13 +73,13 @@ def index():
 @app.route("/download")
 def download():
     """
-    Sends a stream of data to the client for download speed testing for 10 seconds.
+    向客户端发送数据流，用于下载速度测试，持续 10 秒。
     """
 
     def generate():
         start_time = time.time()
         while time.time() - start_time < 10:
-            yield b"0" * 10240  # 10KB chunks
+            yield b"0" * 10240  # 10KB 数据块
 
     return Response(generate(), mimetype="application/octet-stream")
 
@@ -87,9 +87,9 @@ def download():
 @app.route("/upload", methods=["POST"])
 def upload():
     """
-    Receives data from the client for upload speed testing.
+    接收来自客户端的数据，用于上传速度测试。
     """
-    # Read and discard the incoming data to properly handle the stream
+    # 读取并丢弃传入数据以正确处理流
     _ = request.data
     return "OK"
 
@@ -97,7 +97,7 @@ def upload():
 @app.route("/ping")
 def ping():
     """
-    A simple endpoint for the client to measure latency.
+    一个简单的端点，用于客户端测量延迟。
     """
     return "pong"
 
@@ -105,11 +105,11 @@ def ping():
 @app.route("/history", methods=["GET", "POST"])
 def history():
     """
-    Handles storing and retrieving speed test history.
+    处理测速历史记录的存储和检索。
     """
     if request.method == "POST":
         data = request.json
-        # Create a new record with a server-side timestamp and client IP
+        # 创建一个包含服务器端时间戳和客户端 IP 的新记录
         record = {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "ip": request.remote_addr,
@@ -117,14 +117,14 @@ def history():
             "download": data.get("download"),
             "upload": data.get("upload"),
         }
-        speed_test_history.insert(0, record)  # Add to the top of the list
-        # Keep the history to a reasonable size (e.g., last 20 records)
+        speed_test_history.insert(0, record)  # 添加到列表顶部
+        # 将历史记录保持在合理的大小（例如，最近 20 条记录）
         if len(speed_test_history) > 20:
             speed_test_history.pop()
-        # save_history(speed_test_history)
+        # save_history(speed_test_history) # 这一行是注释掉的，保持原样
 
         return jsonify({"status": "success"})
-    else:  # GET request
+    else:  # GET 请求
         return jsonify(speed_test_history)
 
 
