@@ -214,27 +214,84 @@ header p {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
     header h1 {
-        font-size: 2.5em;
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    .speed-test-and-chart-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .speed-test-container {
+        max-width: 100%;
+        width: 100%;
     }
 
     .gauge-wrapper {
-        width: 300px;
-        height: 150px;
+        width: 250px; /* Smaller gauge for mobile */
+        height: 125px;
+        margin-bottom: 10px;
     }
 
     #speed-display {
-        font-size: 2em;
+        font-size: 1.8em;
+    }
+
+    #start-test-btn {
+        padding: 12px 25px;
+        font-size: 1em;
     }
 
     .results-overview {
         flex-direction: column;
+        gap: 10px;
+    }
+
+    .result-box {
+        flex-basis: 100%;
+        padding: 15px;
+    }
+
+    .result-box h2 {
+        font-size: 1em;
+    }
+
+    .result-box p {
+        font-size: 1.8em;
     }
 
     .chart-container {
-        height: 300px;
+        height: 250px; /* Adjust chart height for mobile */
         flex: 1 1 100%;
-        /* Stack charts on small screens */
         max-width: 100%;
+        padding: 15px;
+    }
+
+    .chart-container h2 {
+        font-size: 1.2em;
+    }
+
+    .history-container {
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .history-container h2 {
+        font-size: 1.2em;
+    }
+
+    #history-table th,
+    #history-table td {
+        padding: 8px;
+        font-size: 0.8em;
     }
 }
