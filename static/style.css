@@ -48,7 +48,7 @@ header p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 0 0 400px;
+    flex: 0 0 300px;
     /* Fixed width for the gauge container */
 }
 
@@ -237,13 +237,28 @@ header p {
     }
 
     .gauge-wrapper {
-        width: 250px; /* Smaller gauge for mobile */
-        height: 125px;
+        width: 100%;
+        /* Make it fluid */
+        max-width: 250px;
+        /* Max width for the gauge */
+        height: 0;
+        padding-bottom: 50%;
+        /* Maintain 2:1 aspect ratio (height is 50% of width) */
         margin-bottom: 10px;
+        overflow: hidden;
+        /* Hide overflow from padding-bottom trick */
+    }
+
+    #speed-gauge {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
     }
 
     #speed-display {
-        font-size: 1.8em;
+        font-size: 1.25em;
     }
 
     #start-test-btn {
@@ -270,10 +285,12 @@ header p {
     }
 
     .chart-container {
-        height: 250px; /* Adjust chart height for mobile */
+        height: 200px;
+        /* Slightly smaller chart height for mobile */
         flex: 1 1 100%;
         max-width: 100%;
-        padding: 15px;
+        padding: 10px;
+        /* Reduced padding */
     }
 
     .chart-container h2 {
