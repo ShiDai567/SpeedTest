@@ -1,74 +1,77 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网络测速工具</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>网络速度测试</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Include local Chart.js -->
+    <script src="{{ url_for('static', filename='chart.js') }}"></script>
+    <!-- Include local gauge.js -->
+    <script src="{{ url_for('static', filename='gauge.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 
 <body>
     <div class="container">
-        <h1>网络测速工具</h1>
-        <div class="tabs">
-            <button class="tab-button active" data-tab="speedtest">测速</button>
-            <button class="tab-button" data-tab="history">历史记录</button>
-            <button class="tab-button" data-tab="servers">服务器</button>
-        </div>
-        <div class="tab-content">
-            <div id="speedtest-tab" class="tab-pane active">
-                <div class="speed-test-container">
-                    <button id="start-test" class="test-button">开始测速</button>
-                    <div id="loading" class="loading hidden">
-                        <div class="spinner"></div>
-                        <p id="progress-text">正在测速中...</p>
-                        <div class="progress-bar">
-                            <div id="progress-fill" class="progress-fill"></div>
-                        </div>
-                    </div>
-                    <div id="results" class="results hidden">
-                        <div class="result-item">
-                            <h3>延迟</h3>
-                            <p id="ping-value">-</p>
-                            <span>ms</span>
-                        </div>
-                        <div class="result-item">
-                            <h3>下载速度</h3>
-                            <p id="download-value">-</p>
-                            <span>Mbps</span>
-                        </div>
-                        <div class="result-item">
-                            <h3>上传速度</h3>
-                            <p id="upload-value">-</p>
-                            <span>Mbps</span>
-                        </div>
-                        <div class="result-item">
-                            <h3>服务器</h3>
-                            <p id="server-value">-</p>
-                            <span id="sponsor-value"></span>
-                        </div>
-                        <div class="result-item">
-                            <h3>位置</h3>
-                            <p id="location-value">-</p>
-                            <span>地区</span>
-                        </div>
-                    </div>
+        <header>
+            <h1>网络速度测试</h1>
+            <p>测试您当前的下载速度、上传速度和延迟</p>
+        </header>
+
+        <div class="speed-test-and-chart-wrapper">
+            <div class="speed-test-container">
+                <div class="gauge-wrapper">
+                    <canvas id="speed-gauge"></canvas>
+                    <div id="speed-display">0.00 Mbps</div>
                 </div>
+                <button id="start-test-btn">开始测试</button>
             </div>
-            <div id="history-tab" class="tab-pane">
-                <div id="history-content">
-                    <p>加载中...</p>
-                </div>
+
+            <div class="chart-container download-speed-chart-container">
+                <h2>实时下载速度</h2>
+                <canvas id="download-speed-chart"></canvas>
             </div>
-            <div id="servers-tab" class="tab-pane">
-                <div id="servers-content">
-                    <p>加载中...</p>
-                </div>
+            <div class="chart-container upload-speed-chart-container">
+                <h2>实时上传速度</h2>
+                <canvas id="upload-speed-chart"></canvas>
             </div>
         </div>
-    </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+        <div class="results-overview">
+            <div class="result-box">
+                <h2>Ping</h2>
+                <p><span id="ping-result">-</span> ms</p>
+            </div>
+            <div class="result-box">
+                <h2>下载</h2>
+                <p><span id="download-result">-</span> Mbps</p>
+            </div>
+            <div class="result-box">
+                <h2>上传</h2>
+                <p><span id="upload-result">-</span> Mbps</p>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <h2>测试历史</h2>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>IP地址</th>
+                        <th>Ping (ms)</th>
+                        <th>下载 (Mbps)</th>
+                        <th>上传 (Mbps)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- History rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
 </body>
 
 </html>
