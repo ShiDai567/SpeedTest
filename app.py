@@ -46,16 +46,18 @@ def load_history():
         speed_test_history = []
 
 
-def save_history():
+def save_history(speed_history):
     """
     将当前测速历史记录保存到 JSON 文件。
     """
     try:
         with open(HISTORY_FILE, "w") as f:
-            json.dump(speed_test_history, f, indent=4)
+            json.dump(speed_history, f, indent=4)
         logging.info(f"历史记录已保存到 {HISTORY_FILE}")
     except IOError as e:
         logging.error(f"保存历史记录到 {HISTORY_FILE} 时出错: {e}")
+    except Exception as e:
+        logging.error(f"保存历史记录时发生未知错误: {e}")
 
 
 # 应用启动时加载历史记录
@@ -121,10 +123,11 @@ def history():
         # 将历史记录保持在合理的大小（例如，最近 20 条记录）
         if len(speed_test_history) > 20:
             speed_test_history.pop()
-        # save_history(speed_test_history) # 这一行是注释掉的，保持原样
+        save_history(speed_test_history)
 
         return jsonify({"status": "success"})
     else:  # GET 请求
+        load_history()
         return jsonify(speed_test_history)
 
 
