@@ -69,11 +69,18 @@ header p {
     top: 95%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 200px;
+    /* 固定宽度 */
+    text-align: center;
+    /* 文本居中 */
     font-size: 2em;
-    /* Original font size */
-    /* font-weight: bold; */
     color: #e0e0e0;
-    /* Adjusted for dark theme */
+    white-space: nowrap;
+    /* 防止换行 */
+    overflow: hidden;
+    /* 隐藏溢出部分 */
+    text-overflow: ellipsis;
+    /* 超出部分显示省略号 */
 }
 
 .packet-speed-chart-container {

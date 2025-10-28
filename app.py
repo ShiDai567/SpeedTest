@@ -80,8 +80,9 @@ def download():
 
     def generate():
         start_time = time.time()
+        # 增加每次发送的数据量以获得更准确的结果
         while time.time() - start_time < 10:
-            yield b"0" * 10240  # 10KB 数据块
+            yield b"0" * 1024000  # 1000KB 数据块
 
     return Response(generate(), mimetype="application/octet-stream")
 
