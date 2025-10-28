@@ -73,7 +73,7 @@ header p {
     /* 固定宽度 */
     text-align: center;
     /* 文本居中 */
-    font-size: 2em;
+    font-size: 1.5em;
     color: #e0e0e0;
     white-space: nowrap;
     /* 防止换行 */
@@ -307,15 +307,20 @@ header p {
     .history-container {
         padding: 15px;
         margin-top: 20px;
+        overflow-x: auto;
+        /* 确保移动端也有水平滚动 */
     }
 
-    .history-container h2 {
-        font-size: 1.2em;
+    #history-table {
+        min-width: 400px;
+        /* 移动端表格最小宽度 */
     }
 
     #history-table th,
     #history-table td {
         padding: 8px;
         font-size: 0.8em;
+        white-space: nowrap;
+        /* 防止文本换行 */
     }
 }
