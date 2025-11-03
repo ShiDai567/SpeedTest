@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Element references
+    // 元素引用
     const startBtn = document.getElementById('start-test-btn');
-    const statusEl = document.querySelector('.container p'); // Using the paragraph for status
+    const statusEl = document.querySelector('.container p'); // 使用段落作为状态显示
     const downloadSpeedEl = document.getElementById('download-result');
     const uploadSpeedEl = document.getElementById('upload-result');
     const pingValueEl = document.getElementById('ping-result');
     const speedDisplayEl = document.getElementById('speed-display');
 
-    // Gauge setup
+    // 仪表盘设置
     const gaugeCanvas = document.getElementById('speed-gauge');
     const gauge = new Gauge(gaugeCanvas).setOptions({
         angle: -0.2,
@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
         generateGradient: true,
         highDpiSupport: true,
     });
-    gauge.maxValue = 100; // Set a default max speed in Mbps
+    gauge.maxValue = 100; // 设置默认的最大速度 (Mbps)
     gauge.set(0);
 
-    // Chart.js setup
+    // Chart.js 设置
     gauge.set(0);
 
-    // Download Speed Chart setup
+    // 下载速度图表设置
     const downloadSpeedCanvas = document.getElementById('download-speed-chart');
     const downloadSpeedChart = new Chart(downloadSpeedCanvas, {
         type: 'line',
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             labels: [],
             datasets: [
                 {
-                    label: 'Download Speed (Mbps)',
+                    label: '下载速度 (Mbps)',
                     data: [],
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -58,14 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Speed (Mbps)'
+                        text: '速度 (Mbps)'
                     }
                 }
             }
         }
     });
 
-    // Upload Speed Chart setup
+    // 上传速度图表设置
     const uploadSpeedCanvas = document.getElementById('upload-speed-chart');
     const uploadSpeedChart = new Chart(uploadSpeedCanvas, {
         type: 'line',
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             labels: [],
             datasets: [
                 {
-                    label: 'Upload Speed (Mbps)',
+                    label: '上传速度 (Mbps)',
                     data: [],
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Speed (Mbps)'
+                        text: '速度 (Mbps)'
                     }
                 }
             }
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chart.data.labels.push(now);
         chart.data.datasets[0].data.push(speed);
 
-        // Limit to 50 data points for real-time view
+        // 限制实时视图最多50个数据点
         if (chart.data.labels.length > 50) {
             chart.data.labels.shift();
             chart.data.datasets[0].data.shift();
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxDisplaySpeed = 9999.99;
         const displaySpeed = speed > maxDisplaySpeed ? maxDisplaySpeed : speed;
 
-        // Dynamically adjust max value of gauge
+        // 动态调整仪表盘的最大值
         if (displaySpeed > gauge.maxValue) {
             gauge.maxValue = Math.ceil(displaySpeed / 10) * 10;
         }
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 新增函数：设置仪表盘颜色
+    // 设置仪表盘颜色
     const setGaugeColor = (testType) => {
         // 保存当前的数值
         const currentValue = gauge.displayedValue || 0;
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'default':
             default:
-                // 默认颜色（测试前和测试后）
+                // 默认颜色(测试前和测试后)
                 options.colorStart = '#6FADCF';
                 options.colorStop = '#8FC0DA';
                 break;
@@ -187,22 +187,22 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGauge(0);
         setGaugeColor('default'); // 设置默认颜色
 
-        // Clear download speed chart at the start of a new test
+        // 在新测试开始时清除下载速度图表
         downloadSpeedChart.data.labels = [];
         downloadSpeedChart.data.datasets[0].data = [];
         downloadSpeedChart.update();
-        // Clear upload speed chart at the start of a new test
+        // 在新测试开始时清除上传速度图表
         uploadSpeedChart.data.labels = [];
         uploadSpeedChart.data.datasets[0].data = [];
         uploadSpeedChart.update();
 
         try {
-            // 1. Ping Test
+            // 1. Ping 测试
             statusEl.textContent = '正在测试延迟...';
             const ping = await testPing();
             pingValueEl.textContent = `${ping.toFixed(0)}`;
 
-            // 2. Download Test
+            // 2. 下载测试
             statusEl.textContent = '正在测试下载速度...';
             setGaugeColor('download'); // 设置下载测试颜色
             const downloadSpeed = await testDownload((speed) => {
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // setGaugeColor('default'); // 重置为默认颜色
             await new Promise(resolve => setTimeout(resolve, 500)); // 等待500ms让用户看到指针复位
 
-            // 3. Upload Test
+            // 3. 上传测试
             statusEl.textContent = '正在测试上传速度...';
             setGaugeColor('upload'); // 设置上传测试颜色
             const uploadSpeed = await testUpload((speed) => {
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             statusEl.textContent = '测试完成!';
 
-            // Post results to backend
+            // 将结果发送到后端
             const results = {
                 ping: ping,
                 download: downloadSpeed,
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(results)
             });
 
-            // Refresh history table
+            // 刷新历史记录表
             await updateHistoryTable();
 
         } catch (error) {
@@ -268,13 +268,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const testDownload = (onProgress) => {
         return new Promise(async (resolve, reject) => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const downloadTimeout = 5000; // 5秒
+
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+                console.log('下载测试超时。');
+            }, downloadTimeout);
+
+            let receivedLength = 0;
+            let speeds = []; // 存储所有速度值用于计算平均值
+            const startTime = Date.now();
+
             try {
-                const startTime = Date.now();
-                const response = await fetch(`/download?t=${startTime}`);
+                const response = await fetch(`/download?t=${startTime}`, { signal });
                 const reader = response.body.getReader();
-                let receivedLength = 0;
                 let lastUpdate = startTime;
-                let speeds = []; // 存储所有速度值用于计算平均值
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -291,6 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         lastUpdate = now;
                     }
                 }
+
+                clearTimeout(timeoutId);
 
                 const finalDuration = (Date.now() - startTime) / 1000;
                 // 使用收集到的速度值计算平均速度，排除最高和最低值
@@ -309,7 +321,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 resolve(avgSpeed);
 
             } catch (error) {
-                reject(error);
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    const finalDuration = (Date.now() - startTime) / 1000;
+                    if (speeds.length > 2) {
+                        speeds.sort((a, b) => a - b);
+                        speeds.pop();
+                        speeds.shift();
+                    }
+                    const avgSpeed = speeds.length > 0
+                        ? speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length
+                        : (receivedLength * 8) / finalDuration / 1000000;
+                    onProgress(avgSpeed);
+                    resolve(avgSpeed);
+                } else {
+                    reject(error);
+                }
             }
         });
     };
@@ -318,8 +345,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Promise(async (resolve, reject) => {
             try {
                 // 增加测试时间以获得更稳定的结果
-                const uploadDuration = 10000; // 10秒
-                const chunkSize = 1 * 1024 * 1024; // 1MB chunk
+                const uploadDuration = 5000; // 5秒
+                const chunkSize = 1 * 1024 * 1024; // 1MB 数据块
                 const dummyData = new Uint8Array(chunkSize);
                 let uploadedBytes = 0;
                 const startTime = Date.now();
@@ -384,13 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startBtn.addEventListener('click', runTest);
 
-    // Function to fetch and update history table
+    // 获取并更新历史记录表的函数
     const updateHistoryTable = async () => {
         try {
             const response = await fetch('/history');
             const historyData = await response.json();
             const historyTableBody = document.querySelector('#history-table tbody');
-            historyTableBody.innerHTML = ''; // Clear existing rows
+            historyTableBody.innerHTML = ''; // 清除现有行
 
             historyData.forEach(record => {
                 const row = historyTableBody.insertRow();
@@ -401,10 +428,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.insertCell().textContent = `${record.upload.toFixed(2)} Mbps`;
             });
         } catch (error) {
-            console.error('Failed to fetch history:', error);
+            console.error('获取历史记录失败:', error);
         }
     };
 
-    // Initial load of history
+    // 初始加载历史记录
     updateHistoryTable();
 });

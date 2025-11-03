@@ -1,5 +1,3 @@
-/* static/style.css */
-
 :root {
     --primary-bg-color: #121212;
     --primary-text-color: #e0e0e0;
@@ -11,7 +9,7 @@
     --disabled-color: #555;
     --even-row-bg-color: #282828;
     --row-hover-bg-color: #3a3a3a;
-    --box-shadow-color: rgba(0, 0, 0, 0.2);
+    --box-shadow-color: rgba(0, 0, 0, .2)
 }
 
 body {
@@ -24,27 +22,27 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    text-align: center;
+    text-align: center
 }
 
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 900px
 }
 
 header {
-    margin-bottom: 40px;
+    margin-bottom: 40px
 }
 
 header h1 {
     font-size: 3em;
     color: var(--theme-color);
-    margin-bottom: 10px;
+    margin-bottom: 10px
 }
 
 header p {
     font-size: 1.2em;
-    color: var(--disabled-color);
+    color: var(--disabled-color)
 }
 
 .speed-test-and-chart-wrapper {
@@ -52,30 +50,26 @@ header p {
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
-    margin-bottom: 40px;
-    /* flex-wrap: wrap; */
-    /* Allow wrapping on smaller screens */
+    margin-bottom: 40px
 }
 
 .speed-test-container {
-    /* This container now holds only the gauge and start button */
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 0 0 300px;
-    /* Fixed width for the gauge container */
+    flex: 0 0 300px
 }
 
 .gauge-wrapper {
     position: relative;
     width: 400px;
     height: 200px;
-    margin: 0 auto 20px;
+    margin: 0 auto 20px
 }
 
 #speed-gauge {
     width: 100%;
-    height: 100%;
+    height: 100%
 }
 
 #speed-display {
@@ -84,36 +78,24 @@ header p {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 200px;
-    /* 固定宽度 */
     text-align: center;
-    /* 文本居中 */
     font-size: 1.5em;
     color: var(--primary-text-color);
     white-space: nowrap;
-    /* 防止换行 */
     overflow: hidden;
-    /* 隐藏溢出部分 */
-    text-overflow: ellipsis;
-    /* 超出部分显示省略号 */
+    text-overflow: ellipsis
 }
 
 .packet-speed-chart-container {
     width: 400px;
-    /* Adjust as needed */
     height: 500px;
-    /* Constrain the height */
-    /* Adjust as needed */
-    margin-top: 20px;
-    /* Align with the gauge */
+    margin-top: 20px
 }
-
-
 
 #speed-display.error {
     color: var(--error-color);
     font-size: 1.2em;
-    /* Smaller font for error messages */
-    font-weight: normal;
+    font-weight: normal
 }
 
 #start-test-btn {
@@ -125,27 +107,27 @@ header p {
     font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color .3s, transform .2s
 }
 
 #start-test-btn:hover {
-    background-color: var(--theme-color-hover);
+    background-color: var(--theme-color-hover)
 }
 
 #start-test-btn:active {
-    transform: scale(0.98);
+    transform: scale(.98)
 }
 
 #start-test-btn:disabled {
     background-color: var(--disabled-color);
-    cursor: not-allowed;
+    cursor: not-allowed
 }
 
 .results-overview {
     display: flex;
     justify-content: space-around;
     gap: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 40px
 }
 
 .result-box {
@@ -153,19 +135,19 @@ header p {
     padding: 20px;
     border-radius: 10px;
     flex-basis: 30%;
-    box-shadow: 0 4px 8px var(--box-shadow-color);
+    box-shadow: 0 4px 8px var(--box-shadow-color)
 }
 
 .result-box h2 {
     margin-top: 0;
     font-size: 1.2em;
-    color: var(--theme-color);
+    color: var(--theme-color)
 }
 
 .result-box p {
     font-size: 2em;
     font-weight: bold;
-    margin: 0;
+    margin: 0
 }
 
 .chart-container {
@@ -174,41 +156,35 @@ header p {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px var(--box-shadow-color);
-    /* Constrain the height */
     box-sizing: border-box;
-    /* Include padding in the height */
     flex: 1 1 calc(50% - 10px);
-    /* Distribute space, account for gap */
-    max-width: calc(50% - 10px);
-    /* Ensure two items per row */
+    max-width: calc(50% - 10px)
 }
 
 .chart-container h2 {
     margin-top: 0;
     font-size: 1.5em;
-    margin-bottom: 20px;
+    margin-bottom: 20px
 }
 
-/* History Table */
 .history-container {
     background-color: var(--secondary-bg-color);
     border-radius: 10px;
     box-shadow: 0 4px 8px var(--box-shadow-color);
     padding: 20px;
-    margin-top: 40px;
-    /* Add some space from the elements above */
+    margin-top: 40px
 }
 
 .history-container h2 {
     color: var(--theme-color);
     margin-bottom: 20px;
-    font-size: 1.5em;
+    font-size: 1.5em
 }
 
 #history-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 20px
 }
 
 #history-table th,
@@ -216,58 +192,53 @@ header p {
     border: 1px solid var(--border-color);
     padding: 12px;
     text-align: left;
-    color: var(--primary-text-color);
+    color: var(--primary-text-color)
 }
 
 #history-table th {
     background-color: var(--border-color);
     color: var(--theme-color);
-    font-weight: bold;
+    font-weight: bold
 }
 
 #history-table tbody tr:nth-child(even) {
-    background-color: var(--even-row-bg-color);
+    background-color: var(--even-row-bg-color)
 }
 
 #history-table tbody tr:hover {
-    background-color: var(--row-hover-bg-color);
+    background-color: var(--row-hover-bg-color)
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width:768px) {
     body {
-        padding: 10px;
+        padding: 10px
     }
 
     header h1 {
-        font-size: 2em;
+        font-size: 2em
     }
 
     header p {
-        font-size: 1em;
+        font-size: 1em
     }
 
     .speed-test-and-chart-wrapper {
         flex-direction: column;
-        align-items: center;
+        align-items: center
     }
 
     .speed-test-container {
         max-width: 100%;
-        width: 100%;
+        width: 100%
     }
 
     .gauge-wrapper {
         width: 100%;
-        /* Make it fluid */
         max-width: 250px;
-        /* Max width for the gauge */
         height: 0;
         padding-bottom: 50%;
-        /* Maintain 2:1 aspect ratio (height is 50% of width) */
         margin-bottom: 10px;
-        overflow: hidden;
-        /* Hide overflow from padding-bottom trick */
+        overflow: hidden
     }
 
     #speed-gauge {
@@ -275,66 +246,61 @@ header p {
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 100%
     }
 
     #speed-display {
-        font-size: 1.25em;
+        font-size: 1.25em
     }
 
     #start-test-btn {
         padding: 12px 25px;
-        font-size: 1em;
+        font-size: 1em
     }
 
     .results-overview {
         flex-direction: column;
-        gap: 10px;
+        gap: 10px
     }
 
     .result-box {
         flex-basis: 100%;
-        padding: 15px;
+        padding: 15px
     }
 
     .result-box h2 {
-        font-size: 1em;
+        font-size: 1em
     }
 
     .result-box p {
-        font-size: 1.8em;
+        font-size: 1.8em
     }
 
     .chart-container {
         height: 200px;
-        /* Slightly smaller chart height for mobile */
         flex: 1 1 100%;
         max-width: 100%;
-        padding: 10px;
-        /* Reduced padding */
+        padding: 10px
     }
 
     .chart-container h2 {
-        font-size: 1.2em;
+        font-size: 1.2em
     }
 
     .history-container {
         padding: 15px;
         margin-top: 20px;
-        overflow-x: auto;
-        /* 确保移动端也有水平滚动 */
+        overflow-x: auto
     }
 
     #history-table {
-        min-width: 400px;
-        /* 移动端表格最小宽度 */
+        min-width: 400px
     }
 
     #history-table th,
     #history-table td {
         padding: 8px;
-        font-size: 0.8em;
-        white-space: nowrap;
-        /* 防止文本换行 */
+        font-size: .8em;
+        white-space: nowrap
     }
 }
