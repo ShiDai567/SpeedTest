@@ -28,7 +28,7 @@
 1.  **克隆仓库：**
 
     ```bash
-    git clone https://gitlab.com/Speed-test.git
+    git clone https://gitlab.elsworld.cn:8102/shidai/SpeedTest.git
     cd Speed-test
     ```
 

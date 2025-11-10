@@ -7,11 +7,13 @@ import os
 import time
 
 from flask import Flask, Response, jsonify, render_template, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # 内存中的测速历史记录存储。
 # 在生产应用中，您会希望使用数据库。
